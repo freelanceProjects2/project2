@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import "./ms-freezbe.css";
+import './ms-freezbe.css';
 
 const model = {
   name: '',
@@ -10,25 +10,62 @@ const model = {
   weight: 0,
 };
 
-const Msfreezbe = () => {
-  const [models, setModels] = useState([model]);
+const Freezebee = () => {
+  const [models, setModels] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  useEffect(() => {
+    // Load models from local storage
+    const storedModels = JSON.parse(localStorage.getItem('models'));
+    if (storedModels) {
+      setModels(storedModels);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save models to local storage
+    localStorage.setItem('models', JSON.stringify(models));
+  }, [models]);
 
   const handleAdd = () => {
-    const newModel = { ...model };
-    setModels([...models, newModel]);
+    setIsPopupOpen(true);
   };
 
-  const handleModify = (index) => {
-    const modifiedModel = { ...models[index] };
-    setModels((prevModels) => {
-      prevModels[index] = modifiedModel;
-      return prevModels;
-    });
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const newModel = {
+      name: event.target.name.value,
+      description: event.target.description.value,
+      unitPrice: event.target.unitPrice.value,
+      range: event.target.range.value,
+      ingredients: event.target.ingredients.value.split(', '),
+      weight: event.target.weight.value,
+    };
+
+    setModels([...models, newModel]);
+    handleClosePopup();
+  };
+
+  const handleModify = (index, event) => {
+    const modifiedModel = models[index];
+    modifiedModel.name = event.target.name.value;
+    modifiedModel.description = event.target.description.value;
+    modifiedModel.unitPrice = event.target.unitPrice.value;
+    modifiedModel.range = event.target.range.value;
+    modifiedModel.ingredients = event.target.ingredients.value.split(', ');
+    modifiedModel.weight = event.target.weight.value;
+
+    setModels([...models]);
   };
 
   const handleDelete = (index) => {
-    setModels((prevModels) => prevModels.filter((model, i) => i !== index));
+    setModels([...models.filter((model, i) => i !== index)]);
   };
 
   const handleSearch = (event) => {
@@ -40,15 +77,15 @@ const Msfreezbe = () => {
   });
 
   return (
-    <div>
-      <h1>Freezebee Manager</h1>
-      <div>
+    <div className="model-table">
+      <h1>Model Table</h1>
+      <div className="search-bar">
         <input type="text" placeholder="Search models..." value={searchTerm} onChange={handleSearch} />
       </div>
-      <div>
+      <div className="add-button">
         <button onClick={handleAdd}>Add Model</button>
       </div>
-      <div>
+      <div className="table-container">
         <table>
           <thead>
             <tr>
@@ -79,10 +116,25 @@ const Msfreezbe = () => {
           </tbody>
         </table>
       </div>
+      {isPopupOpen && (
+        <div className="popup">
+          <h1>Add Model</h1>
+          <form onSubmit={handleSubmit}>
+            <input type="text" name="name" placeholder="Name" />
+            <input type="text" name="description" placeholder="Description" />
+            <input type="number" name="unitPrice" placeholder="Unit Price" />
+            <input type="number" name="range" placeholder="Range" />
+            <input type="text" name="ingredients" placeholder="Ingredients (comma separated)" />
+            <input type="number" name="weight" placeholder="Weight" />
+            <div className="popup-buttons">
+              <button type="submit">Submit</button>
+              <button onClick={handleClosePopup}>Cancel</button>
+            </div>
+          </form>
+          </div>
+      )}
+
     </div>
   );
 };
-
-export default Msfreezbe;
-
- 
+export default Freezebee;

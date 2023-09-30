@@ -1,6 +1,10 @@
 body {
     font-family: Arial, sans-serif;
     font-size: 16px;
+  
+        background-image: url('https://img.freepik.com/free-vector/yellow-hexagonal-honeycomb-mesh-pattern-with-text-space_1017-26292.jpg');
+        background-size: cover;
+     
   }
   
   h1 {
